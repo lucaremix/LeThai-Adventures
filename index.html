@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LeThai Adventures</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --gold: #C9A84C;
+      --gold-light: #E8C97A;
+      --dark: #1A1A1A;
+      --dark2: #242424;
+      --dark3: #2E2E2E;
+      --text: #F0EDE6;
+      --text-muted: #9A9487;
+      --accent: #E05A2B;
+      --border: rgba(201,168,76,0.2);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--dark);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      min-height: 100vh;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(26,26,26,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 0.5px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 40px; height: 64px;
+    }
+    nav .nav-logo img { height: 36px; object-fit: contain; }
+    nav ul { list-style: none; display: flex; gap: 32px; }
+    nav ul li a {
+      text-decoration: none; color: var(--text-muted);
+      font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    nav ul li a:hover { color: var(--gold); }
+
+    /* HERO */
+    .hero {
+      height: 100vh;
+      background: url('assets/background.png') center/cover no-repeat;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      position: relative;
+    }
+    .hero::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(to bottom, rgba(26,26,26,0.3) 0%, rgba(26,26,26,0.7) 100%);
+    }
+    .hero-content { position: relative; z-index: 1; text-align: center; }
+    .hero-content img { height: 120px; object-fit: contain; margin-bottom: 24px; filter: drop-shadow(0 4px 24px rgba(0,0,0,0.5)); }
+    .hero-sub {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--gold-light); margin-bottom: 40px;
+    }
+    .hero-scroll {
+      display: inline-flex; align-items: center; gap: 8px;
+      color: var(--text-muted); font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase;
+      text-decoration: none; transition: color 0.2s;
+      animation: bounce 2s infinite;
+    }
+    .hero-scroll:hover { color: var(--gold); }
+    @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(6px)} }
+
+    /* SECTIONS */
+    section { padding: 100px 40px; max-width: 1100px; margin: 0 auto; }
+    .section-label {
+      font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 12px;
+    }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 40px; font-weight: 400; line-height: 1.15;
+      margin-bottom: 40px; color: var(--text);
+    }
+    .divider { width: 40px; height: 1px; background: var(--gold); margin-bottom: 40px; }
+
+    /* MAPPA */
+    #mappa .map-wrapper {
+      border: 0.5px solid var(--border);
+      border-radius: 4px; overflow: hidden;
+      position: relative;
+    }
+    #mappa .map-wrapper iframe { display: block; width: 100%; height: 500px; border: none; }
+
+    /* WISHLIST */
+    #wishlist .wishlist-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px;
+    }
+    .wish-card {
+      background: var(--dark2);
+      border: 0.5px solid var(--border);
+      border-radius: 4px; padding: 20px;
+      display: flex; flex-direction: column; gap: 12px;
+      transition: border-color 0.2s;
+    }
+    .wish-card:hover { border-color: var(--gold); }
+    .wish-card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+    .wish-card-name { font-size: 15px; font-weight: 500; flex: 1; }
+    .wish-card-delete {
+      background: none; border: none; cursor: pointer;
+      color: var(--text-muted); font-size: 18px; line-height: 1;
+      padding: 0; transition: color 0.2s;
+    }
+    .wish-card-delete:hover { color: var(--accent); }
+    .votes { display: flex; gap: 16px; }
+    .vote-block { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+    .vote-label { font-size: 11px; color: var(--text-muted); letter-spacing: 0.05em; }
+    .vote-stars { display: flex; gap: 3px; }
+    .star {
+      width: 20px; height: 20px; cursor: pointer;
+      color: var(--dark3); font-size: 18px; line-height: 1;
+      transition: color 0.15s; user-select: none;
+    }
+    .star.active { color: var(--gold); }
+    .wish-add-row {
+      display: flex; gap: 10px; margin-bottom: 24px;
+    }
+    .wish-add-row input {
+      flex: 1; background: var(--dark2); border: 0.5px solid var(--border);
+      border-radius: 4px; padding: 10px 14px; color: var(--text);
+      font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none;
+      transition: border-color 0.2s;
+    }
+    .wish-add-row input:focus { border-color: var(--gold); }
+    .wish-add-row input::placeholder { color: var(--text-muted); }
+    .btn-add {
+      background: var(--gold); color: var(--dark); border: none;
+      border-radius: 4px; padding: 10px 20px; font-size: 13px; font-weight: 500;
+      cursor: pointer; letter-spacing: 0.05em; transition: background 0.2s;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .btn-add:hover { background: var(--gold-light); }
+
+    /* PACKING */
+    #packing .pack-hero {
+      display: flex; gap: 48px; align-items: flex-start; margin-bottom: 48px;
+    }
+    #packing .pack-hero img { width: 180px; object-fit: contain; opacity: 0.9; }
+    #packing .pack-hero-text { flex: 1; }
+    .pack-add-row { display: flex; gap: 10px; margin-bottom: 24px; }
+    .pack-add-row input {
+      flex: 1; background: var(--dark2); border: 0.5px solid var(--border);
+      border-radius: 4px; padding: 10px 14px; color: var(--text);
+      font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none;
+      transition: border-color 0.2s;
+    }
+    .pack-add-row input:focus { border-color: var(--gold); }
+    .pack-add-row input::placeholder { color: var(--text-muted); }
+    .pack-list { display: flex; flex-direction: column; gap: 0; }
+    .pack-item {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 0; border-bottom: 0.5px solid var(--border);
+      transition: opacity 0.2s;
+    }
+    .pack-item:first-child { border-top: 0.5px solid var(--border); }
+    .pack-check {
+      width: 18px; height: 18px; border-radius: 2px;
+      border: 1.5px solid var(--gold); appearance: none; cursor: pointer;
+      background: transparent; flex-shrink: 0; transition: background 0.15s;
+      position: relative;
+    }
+    .pack-check:checked { background: var(--gold); }
+    .pack-check:checked::after {
+      content: '✓'; position: absolute; top: -1px; left: 2px;
+      font-size: 12px; color: var(--dark); font-weight: 700;
+    }
+    .pack-name { flex: 1; font-size: 14px; }
+    .pack-item.done .pack-name { text-decoration: line-through; color: var(--text-muted); }
+    .pack-link {
+      font-size: 12px; color: var(--gold); text-decoration: none;
+      letter-spacing: 0.05em; border: 0.5px solid var(--border);
+      padding: 3px 10px; border-radius: 2px; transition: all 0.2s;
+    }
+    .pack-link:hover { background: var(--gold); color: var(--dark); }
+    .pack-delete {
+      background: none; border: none; cursor: pointer;
+      color: var(--text-muted); font-size: 16px; transition: color 0.2s; padding: 0;
+    }
+    .pack-delete:hover { color: var(--accent); }
+
+    /* OSTELLI */
+    #ostelli .links-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px;
+    }
+    .link-card {
+      background: var(--dark2); border: 0.5px solid var(--border);
+      border-radius: 4px; padding: 20px 24px;
+      display: flex; flex-direction: column; gap: 6px;
+      text-decoration: none; transition: border-color 0.2s, background 0.2s;
+      position: relative;
+    }
+    .link-card:hover { border-color: var(--gold); background: var(--dark3); }
+    .link-card-tag {
+      font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 4px;
+    }
+    .link-card-name { font-size: 15px; font-weight: 500; color: var(--text); }
+    .link-card-desc { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+    .link-card-arrow {
+      position: absolute; top: 20px; right: 20px;
+      font-size: 16px; color: var(--text-muted);
+    }
+    .add-link-form {
+      background: var(--dark2); border: 0.5px dashed var(--border);
+      border-radius: 4px; padding: 20px 24px; margin-top: 16px;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .add-link-form input, .add-link-form select {
+      background: var(--dark3); border: 0.5px solid var(--border);
+      border-radius: 4px; padding: 9px 12px; color: var(--text);
+      font-family: 'DM Sans', sans-serif; font-size: 13px; outline: none;
+      transition: border-color 0.2s;
+    }
+    .add-link-form input:focus, .add-link-form select:focus { border-color: var(--gold); }
+    .add-link-form input::placeholder { color: var(--text-muted); }
+    .add-link-form select option { background: var(--dark3); }
+    .add-link-form .form-row { display: flex; gap: 10px; }
+    .add-link-form .form-row input { flex: 1; }
+
+    /* INFO */
+    #info .info-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px;
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 0.5px solid var(--border);
+      padding: 32px 40px; text-align: center;
+      color: var(--text-muted); font-size: 12px; letter-spacing: 0.08em;
+    }
+
+    /* EMPTY STATE */
+    .empty {
+      text-align: center; padding: 48px; color: var(--text-muted);
+      font-size: 14px; border: 0.5px dashed var(--border); border-radius: 4px;
+    }
+
+    /* TOAST */
+    #toast {
+      position: fixed; bottom: 32px; right: 32px; z-index: 999;
+      background: var(--gold); color: var(--dark);
+      padding: 12px 20px; border-radius: 4px;
+      font-size: 13px; font-weight: 500;
+      opacity: 0; transform: translateY(8px);
+      transition: opacity 0.3s, transform 0.3s;
+      pointer-events: none;
+    }
+    #toast.show { opacity: 1; transform: translateY(0); }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">
+    <img src="assets/logo.png" alt="LeThai Adventures" />
+  </div>
+  <ul>
+    <li><a href="#mappa">Mappa</a></li>
+    <li><a href="#wishlist">Wishlist</a></li>
+    <li><a href="#packing">Packing</a></li>
+    <li><a href="#ostelli">Ostelli</a></li>
+    <li><a href="#info">Info</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-content">
+    <img src="assets/logo.png" alt="LeThai Adventures" />
+    <p class="hero-sub">Pianificazione viaggio · Thailandia 2027</p>
+    <a href="#mappa" class="hero-scroll">↓ Esplora</a>
+  </div>
+</div>
+
+<!-- MAPPA -->
+<section id="mappa">
+  <div class="section-label">Percorso</div>
+  <h2 class="section-title">Mappa</h2>
+  <div class="divider"></div>
+  <div class="map-wrapper">
+    <iframe src="https://www.google.com/maps/d/u/2/embed?mid=1louGH4ETKRxmzpqRld4wIO5_fwQjg1s&ehbc=2E312F&noprof=1" allowfullscreen></iframe>
+  </div>
+</section>
+
+<!-- WISHLIST -->
+<section id="wishlist">
+  <div class="section-label">Attività</div>
+  <h2 class="section-title">Wishlist</h2>
+  <div class="divider"></div>
+  <div class="wish-add-row">
+    <input type="text" id="wish-input" placeholder="Es. Elephant Sanctuary, Full Moon Party…" />
+    <button class="btn-add" onclick="addWish()">+ Aggiungi</button>
+  </div>
+  <div class="wishlist-grid" id="wishlist-grid">
+    <div class="empty" id="wish-empty">Nessuna attività ancora. Aggiungine una!</div>
+  </div>
+</section>
+
+<!-- PACKING -->
+<section id="packing">
+  <div class="section-label">Equipaggiamento</div>
+  <h2 class="section-title">Packing List</h2>
+  <div class="divider"></div>
+  <div class="pack-hero">
+    <img src="assets/backpack.png" alt="Zaino" />
+    <div class="pack-hero-text">
+      <div class="pack-add-row">
+        <input type="text" id="pack-name-input" placeholder="Oggetto…" />
+        <input type="text" id="pack-link-input" placeholder="Link Amazon (opzionale)" style="max-width:220px" />
+        <button class="btn-add" onclick="addPackItem()">+ Aggiungi</button>
+      </div>
+      <div class="pack-list" id="pack-list">
+        <div class="empty" id="pack-empty">Nessun oggetto ancora.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- OSTELLI -->
+<section id="ostelli">
+  <div class="section-label">Dove dormire</div>
+  <h2 class="section-title">Ostelli & Alloggi</h2>
+  <div class="divider"></div>
+  <div class="links-grid" id="ostelli-grid"></div>
+  <div class="add-link-form" id="ostelli-form">
+    <div class="form-row">
+      <input type="text" id="ost-name" placeholder="Nome ostello / struttura" />
+      <select id="ost-tag">
+        <option value="Ostello">Ostello</option>
+        <option value="Hotel">Hotel</option>
+        <option value="Guesthouse">Guesthouse</option>
+        <option value="Bungalow">Bungalow</option>
+        <option value="Altro">Altro</option>
+      </select>
+    </div>
+    <input type="text" id="ost-desc" placeholder="Città, note, prezzo stimato…" />
+    <input type="url" id="ost-url" placeholder="https://…" />
+    <button class="btn-add" onclick="addOstello()" style="align-self:flex-start">+ Aggiungi</button>
+  </div>
+</section>
+
+<!-- INFO -->
+<section id="info">
+  <div class="section-label">Risorse</div>
+  <h2 class="section-title">Link & Info utili</h2>
+  <div class="divider"></div>
+  <div class="links-grid" id="info-grid"></div>
+  <div class="add-link-form" id="info-form">
+    <div class="form-row">
+      <input type="text" id="info-name" placeholder="Titolo" />
+      <select id="info-tag">
+        <option value="Visto">Visto</option>
+        <option value="Trasporti">Trasporti</option>
+        <option value="Salute">Salute</option>
+        <option value="Valuta">Valuta</option>
+        <option value="SIM">SIM</option>
+        <option value="App">App</option>
+        <option value="Emergenza">Emergenza</option>
+        <option value="Altro">Altro</option>
+      </select>
+    </div>
+    <input type="text" id="info-desc" placeholder="Descrizione breve…" />
+    <input type="url" id="info-url" placeholder="https://…" />
+    <button class="btn-add" onclick="addInfo()" style="align-self:flex-start">+ Aggiungi</button>
+  </div>
+</section>
+
+<footer>
+  LeThai Adventures · Pianificazione viaggio Thailandia
+</footer>
+
+<div id="toast"></div>
+
+<!-- Firebase -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getDatabase, ref, push, set, remove, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCJSZNUxGAAapXSO_dAO1Zo0WJUQ7Cf6lY",
+    authDomain: "lethaiadventures.firebaseapp.com",
+    databaseURL: "https://lethaiadventures-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "lethaiadventures",
+    storageBucket: "lethaiadventures.firebasestorage.app",
+    messagingSenderId: "677317470771",
+    appId: "1:677317470771:web:c9075a5632c665fa75d146"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  function toast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  /* ───── WISHLIST ───── */
+  const wishRef = ref(db, 'wishlist');
+
+  window.addWish = function() {
+    const input = document.getElementById('wish-input');
+    const name = input.value.trim();
+    if (!name) return;
+    push(wishRef, { name, voto1: 0, voto2: 0 });
+    input.value = '';
+    toast('Attività aggiunta!');
+  };
+
+  document.getElementById('wish-input').addEventListener('keydown', e => { if (e.key === 'Enter') window.addWish(); });
+
+  onValue(wishRef, snap => {
+    const grid = document.getElementById('wishlist-grid');
+    const empty = document.getElementById('wish-empty');
+    const data = snap.val();
+    grid.innerHTML = '';
+    if (!data) { grid.appendChild(empty); return; }
+    Object.entries(data).forEach(([id, item]) => {
+      const card = document.createElement('div');
+      card.className = 'wish-card';
+      card.innerHTML = `
+        <div class="wish-card-header">
+          <div class="wish-card-name">${item.name}</div>
+          <button class="wish-card-delete" onclick="deleteWish('${id}')">×</button>
+        </div>
+        <div class="votes">
+          <div class="vote-block">
+            <div class="vote-label">Luca</div>
+            <div class="vote-stars" id="stars1-${id}">${renderStars(item.voto1, id, 1)}</div>
+          </div>
+          <div class="vote-block">
+            <div class="vote-label">Amico</div>
+            <div class="vote-stars" id="stars2-${id}">${renderStars(item.voto2, id, 2)}</div>
+          </div>
+        </div>`;
+      grid.appendChild(card);
+    });
+  });
+
+  function renderStars(val, id, who) {
+    return [1,2,3,4,5].map(i =>
+      `<span class="star ${i <= val ? 'active' : ''}" onclick="setVote('${id}',${who},${i})">★</span>`
+    ).join('');
+  }
+
+  window.setVote = function(id, who, val) {
+    update(ref(db, `wishlist/${id}`), { [`voto${who}`]: val });
+  };
+
+  window.deleteWish = function(id) {
+    remove(ref(db, `wishlist/${id}`));
+    toast('Rimosso.');
+  };
+
+  /* ───── PACKING LIST ───── */
+  const packRef = ref(db, 'packing');
+
+  window.addPackItem = function() {
+    const name = document.getElementById('pack-name-input').value.trim();
+    const link = document.getElementById('pack-link-input').value.trim();
+    if (!name) return;
+    push(packRef, { name, link, done: false });
+    document.getElementById('pack-name-input').value = '';
+    document.getElementById('pack-link-input').value = '';
+    toast('Oggetto aggiunto!');
+  };
+
+  document.getElementById('pack-name-input').addEventListener('keydown', e => { if (e.key === 'Enter') window.addPackItem(); });
+
+  onValue(packRef, snap => {
+    const list = document.getElementById('pack-list');
+    const empty = document.getElementById('pack-empty');
+    const data = snap.val();
+    list.innerHTML = '';
+    if (!data) { list.appendChild(empty); return; }
+    Object.entries(data).forEach(([id, item]) => {
+      const row = document.createElement('div');
+      row.className = `pack-item${item.done ? ' done' : ''}`;
+      row.innerHTML = `
+        <input type="checkbox" class="pack-check" ${item.done ? 'checked' : ''} onchange="togglePack('${id}', this.checked)" />
+        <span class="pack-name">${item.name}</span>
+        ${item.link ? `<a class="pack-link" href="${item.link}" target="_blank" rel="noopener">Amazon ↗</a>` : ''}
+        <button class="pack-delete" onclick="deletePack('${id}')">×</button>`;
+      list.appendChild(row);
+    });
+  });
+
+  window.togglePack = function(id, val) {
+    update(ref(db, `packing/${id}`), { done: val });
+  };
+
+  window.deletePack = function(id) {
+    remove(ref(db, `packing/${id}`));
+    toast('Rimosso.');
+  };
+
+  /* ───── OSTELLI ───── */
+  const ostRef = ref(db, 'ostelli');
+
+  window.addOstello = function() {
+    const name = document.getElementById('ost-name').value.trim();
+    const tag = document.getElementById('ost-tag').value;
+    const desc = document.getElementById('ost-desc').value.trim();
+    const url = document.getElementById('ost-url').value.trim();
+    if (!name) return;
+    push(ostRef, { name, tag, desc, url });
+    ['ost-name','ost-desc','ost-url'].forEach(id => document.getElementById(id).value = '');
+    toast('Aggiunto!');
+  };
+
+  onValue(ostRef, snap => {
+    const grid = document.getElementById('ostelli-grid');
+    grid.innerHTML = '';
+    const data = snap.val();
+    if (!data) return;
+    Object.entries(data).forEach(([id, item]) => {
+      const card = document.createElement('div');
+      card.style.position = 'relative';
+      const inner = document.createElement(item.url ? 'a' : 'div');
+      inner.className = 'link-card';
+      if (item.url) { inner.href = item.url; inner.target = '_blank'; inner.rel = 'noopener'; }
+      inner.innerHTML = `
+        <div class="link-card-tag">${item.tag}</div>
+        <div class="link-card-name">${item.name}</div>
+        ${item.desc ? `<div class="link-card-desc">${item.desc}</div>` : ''}
+        ${item.url ? '<span class="link-card-arrow">↗</span>' : ''}`;
+      const del = document.createElement('button');
+      del.className = 'pack-delete'; del.textContent = '×';
+      del.style.cssText = 'position:absolute;top:12px;right:12px;font-size:18px';
+      if (item.url) del.style.right = '36px';
+      del.onclick = (e) => { e.preventDefault(); remove(ref(db, `ostelli/${id}`)); toast('Rimosso.'); };
+      card.appendChild(inner); card.appendChild(del);
+      grid.appendChild(card);
+    });
+  });
+
+  /* ───── INFO UTILI ───── */
+  const infoRef = ref(db, 'info');
+
+  window.addInfo = function() {
+    const name = document.getElementById('info-name').value.trim();
+    const tag = document.getElementById('info-tag').value;
+    const desc = document.getElementById('info-desc').value.trim();
+    const url = document.getElementById('info-url').value.trim();
+    if (!name) return;
+    push(infoRef, { name, tag, desc, url });
+    ['info-name','info-desc','info-url'].forEach(id => document.getElementById(id).value = '');
+    toast('Aggiunto!');
+  };
+
+  onValue(infoRef, snap => {
+    const grid = document.getElementById('info-grid');
+    grid.innerHTML = '';
+    const data = snap.val();
+    if (!data) return;
+    Object.entries(data).forEach(([id, item]) => {
+      const card = document.createElement('div');
+      card.style.position = 'relative';
+      const inner = document.createElement(item.url ? 'a' : 'div');
+      inner.className = 'link-card';
+      if (item.url) { inner.href = item.url; inner.target = '_blank'; inner.rel = 'noopener'; }
+      inner.innerHTML = `
+        <div class="link-card-tag">${item.tag}</div>
+        <div class="link-card-name">${item.name}</div>
+        ${item.desc ? `<div class="link-card-desc">${item.desc}</div>` : ''}
+        ${item.url ? '<span class="link-card-arrow">↗</span>' : ''}`;
+      const del = document.createElement('button');
+      del.className = 'pack-delete'; del.textContent = '×';
+      del.style.cssText = 'position:absolute;top:12px;right:12px;font-size:18px';
+      if (item.url) del.style.right = '36px';
+      del.onclick = (e) => { e.preventDefault(); remove(ref(db, `info/${id}`)); toast('Rimosso.'); };
+      card.appendChild(inner); card.appendChild(del);
+      grid.appendChild(card);
+    });
+  });
+
+</script>
+</body>
+</html>
